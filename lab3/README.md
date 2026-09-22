@@ -142,8 +142,8 @@ and the array state after each step. The first row is worked.
 | Step | Current `i` | Value at `i` | Children (left, right) | Largest index | Action taken | Array afterward |
 |---|---|---|---|---|---|---|
 | 1 | 0 | 4 | `left=1` (10), `right=2` (8) | 1 | Swap `arr[0]` with `arr[1]` | `[10, 4, 8, 5, 1, 2, 7]` |
-| 2 | TODO | TODO | TODO | TODO | TODO | TODO |
-| 3 | TODO | TODO | TODO | TODO | TODO | TODO |
+| 2 | 1 | 4 | `left=3` (5), `right=4` (1)  | 3 | Swap `arr[1]` with `arr[3]` | `[10, 5, 8, 4, 1, 2, 7]` |
+| 3 | 3 | 4 | no children | 3 | no swap,break | [10,5,8,4,1,2,7] |
 
 ### 1.2 Trace: Heapsort extraction passes
 
@@ -156,11 +156,11 @@ the growing sorted suffix. Pass 1 is worked.
 | Pass (`end`) | Swap root with `arr[end]` | Active heap size | Active heap after `max_heapify_down` | Sorted suffix | Full array afterward |
 |---|---|---|---|---|---|
 | 6 | Swap `15` with `7` | 6 | `[12, 7, 8, 6, 2, 3]` | `[15]` | `[12, 7, 8, 6, 2, 3, 15]` |
-| 5 | TODO | TODO | TODO | TODO | TODO |
-| 4 | TODO | TODO | TODO | TODO | TODO |
-| 3 | TODO | TODO | TODO | TODO | TODO |
-| 2 | TODO | TODO | TODO | TODO | TODO |
-| 1 | TODO | TODO | TODO | TODO | TODO |
+| 5 | Swap `12` with `3` | 5 | `[8, 7, 3, 6, 2]` | TODO | TODO |
+| 4 | Swap `8` with `2` | 4 | `[7, 6, 3, 2]` | TODO | TODO |
+| 3 | Swap `7` with `2` | 3 | `[6, 2, 3]` | TODO | TODO |
+| 2 | Swap `6` with `3` | 2 | `[3, 2]` | TODO | TODO |
+| 1 | Swap `3` with `2` | 1 | `[2]` | TODO | TODO |
 
 Record the final sorted array returned by `heap_sort`.
 
@@ -179,10 +179,13 @@ python3 heap_practice.py
 **TODO 1.4A:** Why does using a Max-Heap produce an *ascending* sort when
 repeatedly extracting the root to the end of the array, whereas using a Min-Heap
 produces a descending sort?
+A Max-Heap puts the largest element at the root, so each time we move it to the end, the largest remaining element goes into its correct final position. This produces ascending order. A Min-Heap does the opposite, so it produces descending order when extracting to the end.
+
 
 **TODO 1.4B:** Bottom-up heap construction (`build_max_heap`) takes $O(n)$ time,
 yet `heap_sort` overall requires $O(n \log n)$ time. Where does the additional
 time come from during the sorting phase?
+
 
 Building a heap takes $\Theta(n)$ time. Each of the $n - 1$ extractions performs
 at most $O(\log n)$ sift-down work, yielding $\Theta(n \log n)$ total time and
@@ -293,11 +296,11 @@ traversal of the tree after insertion. The first two rows are worked.
 |---|---|---|---|
 | 40 | None (Root) | Root | `[40]` |
 | 20 | 40 | Left | `[20, 40]` |
-| 60 | TODO | TODO | TODO |
-| 10 | TODO | TODO | TODO |
-| 30 | TODO | TODO | TODO |
-| 50 | TODO | TODO | TODO |
-| 70 | TODO | TODO | TODO |
+| 60 | 40 | Right | `[20, 40, 60]` |
+| 10 | 20 | Left | `[10, 20, 40, 60]` |
+| 30 | 20 | Right | `[10, 20, 30, 40, 60]` |
+| 50 | 60 | Left | `[10, 20, 30, 40, 50, 60]` |
+| 70 | 60 | Right | `[10, 20, 30, 40, 50, 60, 70]` |
 
 ### 2.2 Trace: Deletion
 
@@ -315,8 +318,8 @@ worked.
 | Target key | Deletion case | Successor key | Node spliced / replaced | In-order traversal afterward |
 |---|---|---|---|---|
 | 10 | 0 children (leaf) | None | 10 | `[20, 30, 40, 50, 60, 70]` |
-| 20 | TODO | TODO | TODO | TODO |
-| 40 | TODO | TODO | TODO | TODO |
+| 20 | 1 child | None | 20 | `[30, 40, 50, 60, 70]` |
+| 40 | 2 children | 50 | 50 replaces 40 | `[30, 50, 60, 70]` |
 
 ### 2.3 Implementation
 
@@ -333,9 +336,11 @@ python3 bst_practice.py
 
 **TODO 2.4A:** In a two-child deletion (Case 3), why is the in-order successor
 guaranteed never to have a left child?
+The in-order successor is the smallest node in the right subtree, so it cannot have a left child. If it did, that left child would be smaller and would be the actual successor.
 
 **TODO 2.4B:** When deleting the root node of the tree, what special pointer
 updates must take place regarding `tree.root` and `node.parent`?
+Set tree.root to the new root and set the new root's parent to None.
 
 All three basic BST operations (search, insert, delete) run in $O(h)$ time,
 where $h$ is the height of the tree. The iterative implementations require
