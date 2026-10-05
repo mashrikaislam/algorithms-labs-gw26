@@ -97,16 +97,17 @@ have a different height, creating imbalances higher up.
 ### 1.1 Short answer: BST deletion reminder
 
 **TODO 1.1:** Briefly recall the three deletion cases from Lab 3/4:
-- What happens when the target node has 0 children?
-- What happens when the target node has 1 child?
-- What happens when the target node has 2 children, and why is the in-order successor used?
+- What happens when the target node has 0 children? Its parent’s pointer to it become NONE
+- What happens when the target node has 1 child? Replace the deleted node with its only child
+- What happens when the target node has 2 children, and why is the in-order successor used? Find the in order successor which is the
+smallest node in the right subtree. We do this to preserve BST ordering
 
 ### 1.2 Short answer: Height change after deletion
 
 **TODO 1.2:** When you delete a leaf node from an AVL tree:
-- Does the leaf's parent's height change? By how much?
-- Can the grandparent's height change?
-- Can the imbalance propagate to the root?
+- Does the leaf's parent's height change? By how much? It can decrease by 1 if that deleted leaf determined its height
+- Can the grandparent's height change? Yes
+- Can the imbalance propagate to the root? Yes. The height decrease can continue from one ancestor to the next to the root 
 
 ---
 
@@ -130,18 +131,18 @@ Start with this AVL tree:
 
 **TODO 2.1:** Delete key `40` from this tree. Trace the rebalancing:
 
-1. Perform BST deletion of 40 (it's a leaf). What is the tree after deletion?
-2. Rebalance from the parent of the deleted node (30).
-3. What is the balance factor at 30?
-4. Identify the violation signature (LL, RR, LR, or RL) and the required rotation.
-5. After rotation, is the tree still imbalanced? If so, continue rebalancing.
+1. Perform BST deletion of 40 (it's a leaf). What is the tree after deletion? In order: 10,20,30
+2. Rebalance from the parent of the deleted node (30). In order : 10,20,30
+3. What is the balance factor at 30? BF = +2 
+4. Identify the violation signature (LL, RR, LR, or RL) and the required rotation. LL, right rotate 40
+5. After rotation, is the tree still imbalanced? If so, continue rebalancing. No
 6. Draw the final tree and record the in-order traversal.
 
 | Step | Action | Tree state | Unbalanced node | BF | Signature | Rotation | Notes |
 |---|---|---|---|---|---|---|---|
 | 1 | Delete 40 | 40 is removed (leaf) | - | - | - | - | Tree now has 30 root, 20 left, nothing right |
-| 2 | Rebalance from 30 | TODO | TODO | TODO | TODO | TODO | TODO |
-| 3 | After rotation | TODO | TODO | TODO | - | - | Final state |
+| 2 | Rebalance from 30 | 30 is left heavy | 30 | +2 | LL | Right rotate 30 | Left child 20 is also left heavy |
+| 3 | After rotation | 20 becomes root, with 10 left and 30 right | none | 0 | - | - | Final state |
 
 ### 2.2 Trace: Double rotation after deletion
 
