@@ -85,62 +85,142 @@ def update_height(node):
 
 
 def balance_factor(node):
-  """Calculate balance factor: height(node.left) - height(node.right).
-
-  Return 0 if node is None.
-  """
-  # TODO 3.2A: Return get_height(node.left) - get_height(node.right).
-  raise NotImplementedError("Complete balance_factor")
-
+  if node is None:
+    return 0
+  return get_height(node.left) - get_height(node.right)
 
 def rotate_left(tree, x):
-  """Perform a single left rotation around node x.
+  y = x.right
+  x.right = y.left
 
-  Pivots on x's right child y. Updates child pointers, parent pointers,
-  tree.root (if x was root), and recalculates heights for x and y.
-  """
-  # TODO 3.2B: Rewire pointers so y = x.right rises into x's position; update heights of x then y.
-  raise NotImplementedError("Complete rotate_left")
+  if y.left is not None:
+    y.left.parent = x
 
+  y.parent = x.parent
+
+  if x.parent is None:
+    tree.root = y
+  elif x == x.parent.left:
+    x.parent.left = y
+  else:
+    x.parent.right = y
+
+  y.left = x
+  x.parent = y
+
+  update_height(x)
+  update_height(y)
+
+  return y
 
 def rotate_right(tree, y):
-  """Perform a single right rotation around node y.
+  x = y.left
+  y.left = x.right
 
-  Pivots on y's left child x. Updates child pointers, parent pointers,
-  tree.root (if y was root), and recalculates heights for y and x.
-  """
-  # TODO 3.2C: Rewire pointers so x = y.left rises into y's position; update heights of y then x.
-  raise NotImplementedError("Complete rotate_right")
+  if x.right is not None:
+    x.right.parent = y
+
+  x.parent = y.parent
+
+  if y.parent is None:
+    tree.root = x
+  elif y == y.parent.left:
+    y.parent.left = x
+  else:
+    y.parent.right = x
+
+  x.right = y
+  y.parent = x
+
+  update_height(y)
+  update_height(x)
+
+  return x
 
 
 def rotate_left_right(tree, z):
-  """Perform a double Left-Right (LR) rotation around node z.
-
-  Rotates left on z's left child, then rotates right on z.
-  """
-  # TODO 3.2D: Call rotate_left on z.left, then rotate_right on z.
-  raise NotImplementedError("Complete rotate_left_right")
+  rotate_left(tree, z.left)
+  return rotate_right(tree, z)
 
 
 def rotate_right_left(tree, z):
-  """Perform a double Right-Left (RL) rotation around node z.
-
-  Rotates right on z's right child, then rotates left on z.
-  """
-  # TODO 3.2E: Call rotate_right on z.right, then rotate_left on z.
-  raise NotImplementedError("Complete rotate_right_left")
+  rotate_right(tree, z.right)
+  return rotate_left(tree, z)
 
 
 def avl_insert_iterative(tree, key):
-  """Insert a key iteratively, restore AVL balance, and return its Node."""
-  # TODO 4.1A: BST-insert with a loop, then walk parent pointers upward updating heights and rotating at the first unbalanced node.
-  raise NotImplementedError("Complete avl_insert_iterative")
+  parent = None
+  current = tree.root
+
+  while current is not None:
+    parent = current
+    if key < current.key:
+      current = current.left
+    else:
+      current = current.right
+
+  new_node = Node(key, parent)
+
+  if parent is None:
+    tree.root = new_node
+  elif key < parent.key:
+    parent.left = new_node
+  else:
+    parent.right = new_node
+
+  current = parent
+
+  while current is not None:
+    update_height(current)
+    bf = balance_factor(current)
+
+    if bf > 1:
+      if balance_factor(current.left) < 0:
+        rotate_left(tree, current.left)
+      new_root = rotate_right(tree, current)
+      current = new_root.parent
+
+    elif bf < -1:
+      if balance_factor(current.right) > 0:
+        rotate_right(tree, current.right)
+      new_root = rotate_left(tree, current)
+      current = new_root.parent
+
+    else:
+      current = current.parent
+
+  return new_node
 
 
 def avl_insert_recursive(tree, key):
-  """Insert a key recursively, restore AVL balance, and return its Node."""
-  # TODO 4.1B: Recurse down to an empty slot; on the way back up, update heights, rotate if unbalanced, and return the subtree root.
-  raise NotImplementedError("Complete avl_insert_recursive")
+  def insert(node, key, parent):
+    if node is None:
+      return Node(key, parent)
+
+    if key < node.key:
+      node.left = insert(node.left, key, node)
+    else:
+      node.right = insert(node.right, key, node)
+
+    update_height(node)
+    bf = balance_factor(node)
+
+    if bf > 1:
+      if balance_factor(node.left) < 0:
+        rotate_left(tree, node.left)
+      return rotate_right(tree, node)
+
+    if bf < -1:
+      if balance_factor(node.right) > 0:
+        rotate_right(tree, node.right)
+      return rotate_left(tree, node)
+
+    return node
+
+  tree.root = insert(tree.root, key, None)
+  tree.root.parent = None
+
+  return bst_search(tree.root, key)
 
 
 if __name__ == "__main__":
