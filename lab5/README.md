@@ -245,18 +245,18 @@ measuring the number of rotations triggered by each operation.
 **TODO 4.1:** Based on your implementation and understanding of the algorithm:
 
 1. Why can a single deletion trigger multiple rotations at different ancestors,
-   whereas a single insertion triggers at most one rotation?
-2. What property of rotations ensures that insertion stops after one fix?
-3. Does a deletion ever need to rebalance higher than the root? Explain.
+   whereas a single insertion triggers at most one rotation?  Deletion can reduce the height of a subtree. This height decrease can make multiple ancestors unbalanced, so the algorithm may need to perform rotations at several levels. Insertion can also require a double rotation, but fixing the first unbalanced ancestor restores that subtree to its previous height, so no higher ancestor becomes newly unbalanced.
+2. What property of rotations ensures that insertion stops after one fix? After rebalancing an insertion, the rotated subtree returns to its original height before the insertion. This means the height change does not propagate any further up the tree.
+3. Does a deletion ever need to rebalance higher than the root? Explain. No. The algorithm starts at the affected node's parent and continues toward the root, checking each ancestor. The root is the highest node that can require rebalancing.
 
 ### 4.2 Short answer: Real-world implications
 
 **TODO 4.2:** Consider a scenario where an application frequently insertions and deletions
 in an AVL tree (e.g., a priority queue or cache).
 
-1. Based on the rotation cost, would you expect insertions or deletions to be slower?
+1. Based on the rotation cost, would you expect insertions or deletions to be slower? Deletions can be slower because they may require multiple rotations at different ancestors, whereas insertion needs at most one rebalancing fix.
 2. If deletions become a bottleneck, what alternative data structure (from this course)
-   might handle deletions more efficiently?
+   might handle deletions more efficiently? A red-black tree
 
 ---
 
