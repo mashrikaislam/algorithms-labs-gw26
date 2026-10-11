@@ -165,79 +165,68 @@ def rotate_right_left(tree, z):
     rotate_left(tree, z)
 
 
+
 def avl_delete(tree, key):
-    """
-    TODO 3.1: Implement AVL deletion with rebalancing.
-
-    Steps:
-    1. Locate the node to delete (z).
-    2. If z is a leaf (0 children), remove it and rebalance from z.parent.
-    3. If z has 1 child, replace it and rebalance from z.parent.
-    4. If z has 2 children:
-       a. Find in-order successor y (minimum of z.right).
-       b. If y != z.right, remove y and rebalance from y.parent first.
-       c. Replace z with y and rebalance from the appropriate node.
-    5. Continue rebalancing up to the root.
-
-    Remember:
-    - Unlike insertion, deletion may require multiple rotations at different ancestors.
-    - Use balance factor signs to determine rotation type (no inserted key available).
-    - Continue rebalancing all the way to the root.
-    """
     z = tree_search(tree.root, key)
     if z is None:
         return None
 
     rebalance_from = None
 
-    # Handle deletion cases
     if z.left is None:
-        # Case 0 or 1: no left child
         rebalance_from = z.parent
         transplant(tree, z, z.right)
+
     elif z.right is None:
-        # Case 1: no right child
         rebalance_from = z.parent
         transplant(tree, z, z.left)
+
     else:
-        # Case 2: two children
         y = tree_minimum(z.right)
+
         if y.parent != z:
-            # y is not z's immediate right child
-            # First, rebalance from y's parent after removing y
             rebalance_from = y.parent
             transplant(tree, y, y.right)
+
             y.right = z.right
             y.right.parent = y
         else:
-            # y is z's immediate right child
             rebalance_from = y
-        # Replace z with y
+
         transplant(tree, z, y)
         y.left = z.left
         y.left.parent = y
 
-    # Rebalance from the affected node up to the root
     current = rebalance_from
+
     while current is not None:
         update_height(current)
         bf = balance_factor(current)
 
-        if bf > 1:  # Left-heavy
+        if bf > 1:
+            parent = current.parent
+
             if balance_factor(current.left) >= 0:
                 rotate_right(tree, current)
             else:
                 rotate_left_right(tree, current)
-        elif bf < -1:  # Right-heavy
+
+            current = parent
+
+        elif bf < -1:
+            parent = current.parent
+
             if balance_factor(current.right) <= 0:
                 rotate_left(tree, current)
             else:
                 rotate_right_left(tree, current)
 
-        current = current.parent
+            current = parent
+
+        else:
+            current = current.parent
 
     return z
-
 
 def inorder_traversal(node):
     """Return in-order traversal of subtree as a list."""
